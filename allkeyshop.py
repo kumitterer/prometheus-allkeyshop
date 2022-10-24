@@ -142,7 +142,7 @@ for section, settings in filter(lambda x: x[0] != "DEFAULT", config.items()):
                 product, platform, currency=currency, region=region, edition=edition)
 
         gauge = Gauge(
-            f"allkeyshop_{AllKeyShop.ProductPageRequest.to_slug(name).replace('-', '_')}_{currency}", "Best price for {name}")
+            f"allkeyshop_{AllKeyShop.ProductPageRequest.to_slug(name).replace('-', '_')}_{currency}", f"Best price for {name}")
         gauges.append((gauge, aks))
 
     except Exception as e:
