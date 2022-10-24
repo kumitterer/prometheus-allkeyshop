@@ -153,17 +153,20 @@ start_http_server(8090)
 
 while True:
     for gauge, aks in gauges:
-        offers: List[dict] = aks.get_offers()
-        available_offers: List[dict] = filter(
-            lambda x: x["stock"] == "InStock", offers)
-        store: Optional[str]
-
-        if (store := settings.get("Store", fallback=defaults.get("Store", ""))):
+        try:
+            offers: List[dict] = aks.get_offers()
             available_offers: List[dict] = filter(
-                lambda x: x["platform"] == store, available_offers)
+                lambda x: x["stock"] == "InStock", offers)
+            store: Optional[str]
 
-        best_offer: dict = min(
-            available_offers, key=lambda x: x["price"][currency]["price"])
-        gauge.set(best_offer["price"][currency]["price"])
+            if (store := settings.get("Store", fallback=defaults.get("Store", ""))):
+                available_offers: List[dict] = filter(
+                    lambda x: x["platform"] == store, available_offers)
+
+            best_offer: dict = min(
+                available_offers, key=lambda x: x["price"][currency]["price"])
+            gauge.set(best_offer["price"][currency]["price"])
+        except Exception as e:
+            print(f"Error updating gauge value for {gauge._name}: {e}")
 
     time.sleep(60)
